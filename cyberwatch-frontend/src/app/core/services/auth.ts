@@ -30,6 +30,7 @@ export interface LoginResponse {
   lastName: string;
   email: string;
   role: 'ADMIN' | 'ANALYST';
+  token: string;
 }
 
 @Injectable({
