@@ -1,1 +1,169 @@
-<p>dashboard works!</p>
+<div class="dashboard-layout">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="logo-icon">C</div>
+      <span>CyberWatch</span>
+    </div>
+
+    <nav>
+      <a class="active">Dashboard</a>
+      <a>Alerts</a>
+      <a>Incidents</a>
+      <a>Machines</a>
+      <a>Analysts</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="status-dot"></span>
+      System operational
+    </div>
+
+  </aside>
+
+  <main class="main-content">
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SECURITY OPERATIONS CENTER</p>
+        <h1>Security Dashboard</h1>
+      </div>
+
+      <div class="user-box">
+        <div class="avatar">A</div>
+        <div>
+          <strong>Analyst</strong>
+          <span>CyberWatch SOC</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats-grid">
+
+      <div class="stat-card">
+        <span>Total Alerts</span>
+        <strong>{{ totalAlerts }}</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>Open Alerts</span>
+        <strong>{{ openAlerts }}</strong>
+      </div>
+
+      <div class="stat-card">
+        <span>High Severity</span>
+        <strong>{{ highAlerts }}</strong>
+      </div>
+
+      <div class="stat-card danger">
+        <span>Critical</span>
+        <strong>{{ criticalAlerts }}</strong>
+      </div>
+
+    </section>
+
+    <section class="alerts-section">
+
+      <div class="section-header">
+        <div>
+          <h2>Recent Security Alerts</h2>
+          <p>Monitor detected threats and suspicious activity.</p>
+        </div>
+
+        <button (click)="loadAlerts()">
+          Refresh
+        </button>
+      </div>
+
+      @if (loading) {
+        <div class="state-message">
+          Loading security alerts...
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="state-message error">
+          {{ errorMessage }}
+        </div>
+      }
+
+      @if (!loading && alerts.length === 0) {
+        <div class="state-message">
+          No security alerts detected.
+        </div>
+      }
+
+      @if (!loading && alerts.length > 0) {
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+              <tr>
+                <th>Alert</th>
+                <th>Source IP</th>
+                <th>Destination</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Detected</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              @for (alert of alerts; track alert.id) {
+
+                <tr>
+
+                  <td>
+                    <div class="alert-title">
+                      <strong>{{ alert.title }}</strong>
+                      <span>{{ alert.description }}</span>
+                    </div>
+                  </td>
+
+                  <td>{{ alert.sourceIp }}</td>
+
+                  <td>{{ alert.destinationIp }}</td>
+
+                  <td>
+                    <span
+                      class="badge"
+                      [class.low]="alert.severity === 'LOW'"
+                      [class.medium]="alert.severity === 'MEDIUM'"
+                      [class.high]="alert.severity === 'HIGH'"
+                      [class.critical]="alert.severity === 'CRITICAL'"
+                    >
+                      {{ alert.severity }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span class="status-badge">
+                      {{ alert.status }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ alert.detectedAt | date:'short' }}
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      }
+
+    </section>
+
+  </main>
+
+</div>
