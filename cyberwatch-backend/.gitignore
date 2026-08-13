@@ -1,0 +1,19 @@
+# Secrets
+.env
+*.env
+
+# Angular
+cyberwatch-frontend/node_modules/
+cyberwatch-frontend/dist/
+cyberwatch-frontend/.angular/
+
+# Spring Boot / Maven
+cyberwatch-backend/target/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
