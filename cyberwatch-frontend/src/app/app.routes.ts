@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { Machines } from './pages/machines/machines';
 
 export const routes: Routes = [
   {
@@ -37,13 +38,20 @@ export const routes: Routes = [
         .then(m => m.Alerts),
     canActivate: [authGuard]
   },
+
   {
-  path: 'incidents',
-  loadComponent: () =>
-    import('./features/incidents/incidents')
-      .then(m => m.Incidents),
-  canActivate: [authGuard]
-},
+    path: 'incidents',
+    loadComponent: () =>
+      import('./features/incidents/incidents')
+        .then(m => m.Incidents),
+    canActivate: [authGuard]
+  },
+
+  {
+    path: 'machines',
+    component: Machines,
+    canActivate: [authGuard]
+  },
 
   {
     path: '**',

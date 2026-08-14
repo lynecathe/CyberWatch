@@ -12,6 +12,11 @@ import {
   SecurityAlert
 } from '../../core/services/alert';
 
+import {
+  MachineService,
+  Machine
+} from '../../core/services/machine';
+
 @Component({
   selector: 'app-dashboard',
   imports: [
@@ -24,16 +29,20 @@ import {
 export class Dashboard implements OnInit {
 
   alerts: SecurityAlert[] = [];
+  machines: Machine[] = [];
+
   loading = true;
   errorMessage = '';
 
   constructor(
     private alertService: AlertService,
+    private machineService: MachineService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadAlerts();
+    this.loadMachines();
   }
 
   loadAlerts(): void {
@@ -61,6 +70,22 @@ export class Dashboard implements OnInit {
     });
   }
 
+  loadMachines(): void {
+    this.machineService.getAllMachines().subscribe({
+      next: (machines) => {
+        console.log('DASHBOARD MACHINES RECEIVED', machines);
+
+        this.machines = machines;
+
+        this.cdr.markForCheck();
+      },
+
+      error: (error) => {
+        console.error('DASHBOARD MACHINES ERROR', error);
+      }
+    });
+  }
+
   get totalAlerts(): number {
     return this.alerts.length;
   }
@@ -80,6 +105,28 @@ export class Dashboard implements OnInit {
   get openAlerts(): number {
     return this.alerts.filter(
       alert => alert.status !== 'RESOLVED'
+    ).length;
+  }
+
+  get totalMachines(): number {
+    return this.machines.length;
+  }
+
+  get onlineMachines(): number {
+    return this.machines.filter(
+      machine => machine.status === 'ONLINE'
+    ).length;
+  }
+
+  get offlineMachines(): number {
+    return this.machines.filter(
+      machine => machine.status === 'OFFLINE'
+    ).length;
+  }
+
+  get compromisedMachines(): number {
+    return this.machines.filter(
+      machine => machine.status === 'COMPROMISED'
     ).length;
   }
 }

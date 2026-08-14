@@ -11,78 +11,79 @@
       Refresh
     </button>
   </div>
+
+  <!-- FILTERS -->
   <div class="filters">
 
-  <button
-    [class.active]="filter === 'ALL'"
-    (click)="setFilter('ALL')"
-  >
-    All
-  </button>
+    <button
+      [class.active]="filter === 'ALL'"
+      (click)="setFilter('ALL')">
+      All
+    </button>
 
-  <button
-    [class.active]="filter === 'NEW'"
-    (click)="setFilter('NEW')"
-  >
-    New
-  </button>
+    <button
+      [class.active]="filter === 'NEW'"
+      (click)="setFilter('NEW')">
+      New
+    </button>
 
-  <button
-    [class.active]="filter === 'INVESTIGATING'"
-    (click)="setFilter('INVESTIGATING')"
-  >
-    Investigating
-  </button>
+    <button
+      [class.active]="filter === 'INVESTIGATING'"
+      (click)="setFilter('INVESTIGATING')">
+      Investigating
+    </button>
 
-  <button
-    [class.active]="filter === 'RESOLVED'"
-    (click)="setFilter('RESOLVED')"
-  >
-    Resolved
-  </button>
+    <button
+      [class.active]="filter === 'RESOLVED'"
+      (click)="setFilter('RESOLVED')">
+      Resolved
+    </button>
 
-  <button
-    [class.active]="filter === 'HIGH'"
-    (click)="setFilter('HIGH')"
-  >
-    High
-  </button>
+    <button
+      [class.active]="filter === 'HIGH'"
+      (click)="setFilter('HIGH')">
+      High
+    </button>
 
-  <button
-    [class.active]="filter === 'CRITICAL'"
-    (click)="setFilter('CRITICAL')"
-  >
-    Critical
-  </button>
+    <button
+      [class.active]="filter === 'CRITICAL'"
+      (click)="setFilter('CRITICAL')">
+      Critical
+    </button>
 
-</div>
+  </div>
 
+  <!-- LOADING -->
   @if (loading) {
     <div class="message">
       Loading security alerts...
     </div>
   }
 
+  <!-- ERROR -->
   @if (errorMessage) {
     <div class="message error">
       {{ errorMessage }}
     </div>
   }
 
+  <!-- NO ALERTS -->
   @if (!loading && alerts.length === 0) {
     <div class="message">
       No security alerts detected.
     </div>
   }
 
+  <!-- ALERT LIST -->
   @if (!loading && alerts.length > 0) {
 
     <div class="alerts-list">
 
-      @for (alert of alerts; track alert.id) {
+      @for (alert of filteredAlerts; track alert.id) {
 
         <article class="alert-card">
 
+          <!-- ALERT HEADER -->
           <div class="alert-top">
 
             <div>
@@ -95,13 +96,13 @@
               [class.low]="alert.severity === 'LOW'"
               [class.medium]="alert.severity === 'MEDIUM'"
               [class.high]="alert.severity === 'HIGH'"
-              [class.critical]="alert.severity === 'CRITICAL'"
-            >
+              [class.critical]="alert.severity === 'CRITICAL'">
               {{ alert.severity }}
             </span>
 
           </div>
 
+          <!-- NETWORK INFORMATION -->
           <div class="network-info">
 
             <div>
@@ -123,6 +124,7 @@
 
           </div>
 
+          <!-- FOOTER -->
           <div class="alert-footer">
 
             <div>
@@ -130,33 +132,49 @@
               <strong>{{ alert.status }}</strong>
             </div>
 
+            <!-- STATUS ACTIONS -->
             <div class="actions">
 
               <button
                 class="new"
                 [disabled]="alert.status === 'NEW'"
-                (click)="changeStatus(alert, 'NEW')"
-              >
+                (click)="changeStatus(alert, 'NEW')">
                 New
               </button>
 
               <button
                 class="investigate"
                 [disabled]="alert.status === 'INVESTIGATING'"
-                (click)="changeStatus(alert, 'INVESTIGATING')"
-              >
+                (click)="changeStatus(alert, 'INVESTIGATING')">
                 Investigate
               </button>
 
               <button
                 class="resolve"
                 [disabled]="alert.status === 'RESOLVED'"
-                (click)="changeStatus(alert, 'RESOLVED')"
-              >
+                (click)="changeStatus(alert, 'RESOLVED')">
                 Resolve
               </button>
 
             </div>
+
+            <!-- CREATE INCIDENT -->
+            <button
+              class="create-incident"
+              (click)="createIncident(alert)"
+              [disabled]="
+                (alert.severity !== 'HIGH' &&
+                 alert.severity !== 'CRITICAL') ||
+                incidentAlertIds.has(alert.id)
+              ">
+
+              @if (incidentAlertIds.has(alert.id)) {
+                Incident Created
+              } @else {
+                Create Incident
+              }
+
+            </button>
 
           </div>
 
