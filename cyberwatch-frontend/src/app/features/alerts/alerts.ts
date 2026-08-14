@@ -1,9 +1,19 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import {
   AlertService,
   SecurityAlert
 } from '../../core/services/alert';
+
+import {
+  IncidentService
+} from '../../core/services/incident';
 
 @Component({
   selector: 'app-alerts',
@@ -17,6 +27,8 @@ export class Alerts implements OnInit {
   loading = true;
   errorMessage = '';
 
+  incidentAlertIds = new Set<number>();
+
   filter:
     'ALL' |
     'NEW' |
@@ -27,11 +39,13 @@ export class Alerts implements OnInit {
 
   constructor(
     private alertService: AlertService,
+    private incidentService: IncidentService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadAlerts();
+    this.loadExistingIncidents();
   }
 
   loadAlerts(): void {
@@ -59,6 +73,29 @@ export class Alerts implements OnInit {
     });
   }
 
+  loadExistingIncidents(): void {
+
+    this.incidentService.getAllIncidents().subscribe({
+      next: (incidents) => {
+
+        this.incidentAlertIds = new Set(
+          incidents
+            .filter(incident => incident.alert?.id != null)
+            .map(incident => incident.alert!.id)
+        );
+
+        this.cdr.markForCheck();
+      },
+
+      error: (error) => {
+        console.error(
+          'Unable to load existing incidents',
+          error
+        );
+      }
+    });
+  }
+
   changeStatus(
     alert: SecurityAlert,
     status: 'NEW' | 'INVESTIGATING' | 'RESOLVED'
@@ -73,8 +110,9 @@ export class Alerts implements OnInit {
 
         if (index !== -1) {
           this.alerts[index] = updatedAlert;
-          this.cdr.markForCheck();
         }
+
+        this.cdr.markForCheck();
       },
 
       error: (error) => {
@@ -84,6 +122,46 @@ export class Alerts implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  createIncident(alert: SecurityAlert): void {
+
+    this.errorMessage = '';
+
+    this.incidentService
+      .createFromAlert(alert.id)
+      .subscribe({
+
+        next: (incident) => {
+
+          console.log('INCIDENT CREATED', incident);
+
+          this.incidentAlertIds.add(alert.id);
+
+          this.cdr.markForCheck();
+        },
+
+        error: (error) => {
+
+          console.error(error);
+
+          if (error.status === 409) {
+
+            this.errorMessage =
+              error.error?.message ??
+              'An incident already exists for this alert.';
+
+            this.incidentAlertIds.add(alert.id);
+
+          } else {
+
+            this.errorMessage =
+              'Unable to create incident from this alert.';
+          }
+
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   get filteredAlerts(): SecurityAlert[] {

@@ -61,4 +61,15 @@ public class IncidentController {
 
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("/from-alert/{alertId}")
+public ResponseEntity<Incident> createIncidentFromAlert(
+        @PathVariable Long alertId
+) {
+    Incident incident =
+            incidentService.createIncidentFromAlert(alertId);
+
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(incident);
+}
 }

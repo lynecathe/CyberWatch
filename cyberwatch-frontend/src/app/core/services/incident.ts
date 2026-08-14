@@ -9,6 +9,10 @@ export interface Incident {
   severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'CLOSED';
   createdAt: string;
+
+  alert?: {
+    id: number;
+  };
 }
 
 @Injectable({
@@ -33,4 +37,10 @@ export class IncidentService {
       {}
     );
   }
+  createFromAlert(alertId: number): Observable<Incident> {
+  return this.http.post<Incident>(
+    `${this.apiUrl}/from-alert/${alertId}`,
+    {}
+  );
+}
 }

@@ -1,0 +1,120 @@
+<div class="machines-page">
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">CYBERWATCH SOC</p>
+      <h1>Machines</h1>
+      <p>Monitor endpoints and infrastructure connected to CyberWatch.</p>
+    </div>
+
+    <button (click)="loadMachines()">
+      Refresh
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="message">
+      Loading machines...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (!loading && machines.length === 0) {
+    <div class="message">
+      No machines registered.
+    </div>
+  }
+
+  @if (!loading && machines.length > 0) {
+
+    <div class="machines-grid">
+
+      @for (machine of machines; track machine.id) {
+
+        <article class="machine-card">
+
+          <div class="machine-header">
+
+            <div>
+              <h2>{{ machine.hostname }}</h2>
+              <p>{{ machine.operatingSystem }}</p>
+            </div>
+
+            <span
+              class="status"
+              [class.online]="machine.status === 'ONLINE'"
+              [class.offline]="machine.status === 'OFFLINE'"
+              [class.compromised]="machine.status === 'COMPROMISED'"
+            >
+              {{ machine.status }}
+            </span>
+
+          </div>
+
+          <div class="machine-info">
+
+            <div>
+              <span>IP Address</span>
+              <strong>{{ machine.ipAddress }}</strong>
+            </div>
+
+            <div>
+              <span>Criticality</span>
+
+              <strong
+                [class.high]="machine.criticality === 'HIGH'"
+                [class.critical]="machine.criticality === 'CRITICAL'"
+              >
+                {{ machine.criticality }}
+              </strong>
+            </div>
+
+            <div>
+              <span>Last Seen</span>
+              <strong>
+                {{ machine.lastSeen | date:'medium' }}
+              </strong>
+            </div>
+
+          </div>
+
+          <div class="machine-actions">
+
+            <button
+              [disabled]="machine.status === 'ONLINE'"
+              (click)="changeStatus(machine, 'ONLINE')"
+            >
+              Online
+            </button>
+
+            <button
+              [disabled]="machine.status === 'OFFLINE'"
+              (click)="changeStatus(machine, 'OFFLINE')"
+            >
+              Offline
+            </button>
+
+            <button
+              class="danger"
+              [disabled]="machine.status === 'COMPROMISED'"
+              (click)="changeStatus(machine, 'COMPROMISED')"
+            >
+              Compromised
+            </button>
+
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  }
+
+</div>
