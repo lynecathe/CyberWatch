@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+
 import {
   AlertService,
   SecurityAlert
@@ -7,7 +14,10 @@ import {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -18,7 +28,8 @@ export class Dashboard implements OnInit {
   errorMessage = '';
 
   constructor(
-    private alertService: AlertService
+    private alertService: AlertService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -31,14 +42,21 @@ export class Dashboard implements OnInit {
 
     this.alertService.getAllAlerts().subscribe({
       next: (alerts) => {
+        console.log('DASHBOARD ALERTS RECEIVED', alerts);
+
         this.alerts = alerts;
         this.loading = false;
+
+        this.cdr.markForCheck();
       },
 
       error: (error) => {
-        console.error(error);
+        console.error('DASHBOARD ALERT ERROR', error);
+
         this.errorMessage = 'Unable to load security alerts.';
         this.loading = false;
+
+        this.cdr.markForCheck();
       }
     });
   }

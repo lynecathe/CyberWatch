@@ -25,4 +25,15 @@ export class AlertService {
   getAllAlerts(): Observable<SecurityAlert[]> {
     return this.http.get<SecurityAlert[]>(this.apiUrl);
   }
+  
+  updateStatus(
+  id: number,
+  status: 'NEW' | 'INVESTIGATING' | 'RESOLVED'
+): Observable<SecurityAlert> {
+
+  return this.http.patch<SecurityAlert>(
+    `${this.apiUrl}/${id}/status?status=${status}`,
+    {}
+  );
+}
 }

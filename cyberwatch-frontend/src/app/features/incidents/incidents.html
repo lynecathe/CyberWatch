@@ -1,0 +1,157 @@
+<div class="incidents-page">
+
+  <div class="page-header">
+
+    <div>
+      <p class="eyebrow">CYBERWATCH SOC</p>
+      <h1>Security Incidents</h1>
+      <p>
+        Investigate and manage confirmed security incidents.
+      </p>
+    </div>
+
+    <button (click)="loadIncidents()">
+      Refresh
+    </button>
+
+  </div>
+
+  <div class="filters">
+
+    <button
+      [class.active]="filter === 'ALL'"
+      (click)="setFilter('ALL')">
+      All
+    </button>
+
+    <button
+      [class.active]="filter === 'OPEN'"
+      (click)="setFilter('OPEN')">
+      Open
+    </button>
+
+    <button
+      [class.active]="filter === 'INVESTIGATING'"
+      (click)="setFilter('INVESTIGATING')">
+      Investigating
+    </button>
+
+    <button
+      [class.active]="filter === 'RESOLVED'"
+      (click)="setFilter('RESOLVED')">
+      Resolved
+    </button>
+
+    <button
+      [class.active]="filter === 'CLOSED'"
+      (click)="setFilter('CLOSED')">
+      Closed
+    </button>
+
+  </div>
+
+  @if (loading) {
+    <div class="message">
+      Loading incidents...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (!loading && filteredIncidents.length === 0) {
+    <div class="message">
+      No incidents found.
+    </div>
+  }
+
+  @if (!loading && filteredIncidents.length > 0) {
+
+    <div class="incidents-list">
+
+      @for (incident of filteredIncidents; track incident.id) {
+
+        <article class="incident-card">
+
+          <div class="incident-header">
+
+            <div>
+              <span class="incident-id">
+                INCIDENT #{{ incident.id }}
+              </span>
+
+              <h2>{{ incident.title }}</h2>
+
+              <p>{{ incident.description }}</p>
+            </div>
+
+            <span
+              class="severity"
+              [class.low]="incident.severity === 'LOW'"
+              [class.medium]="incident.severity === 'MEDIUM'"
+              [class.high]="incident.severity === 'HIGH'"
+              [class.critical]="incident.severity === 'CRITICAL'">
+              {{ incident.severity }}
+            </span>
+
+          </div>
+
+          <div class="incident-info">
+
+            <div>
+              <span>Status</span>
+              <strong>{{ incident.status }}</strong>
+            </div>
+
+            <div>
+              <span>Created</span>
+              <strong>
+                {{ incident.createdAt | date:'medium' }}
+              </strong>
+            </div>
+
+          </div>
+
+          <div class="actions">
+
+            <button
+              [disabled]="incident.status === 'OPEN'"
+              (click)="changeStatus(incident, 'OPEN')">
+              Open
+            </button>
+
+            <button
+              class="investigate"
+              [disabled]="incident.status === 'INVESTIGATING'"
+              (click)="changeStatus(incident, 'INVESTIGATING')">
+              Investigate
+            </button>
+
+            <button
+              class="resolve"
+              [disabled]="incident.status === 'RESOLVED'"
+              (click)="changeStatus(incident, 'RESOLVED')">
+              Resolve
+            </button>
+
+            <button
+              class="close"
+              [disabled]="incident.status === 'CLOSED'"
+              (click)="changeStatus(incident, 'CLOSED')">
+              Close
+            </button>
+
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  }
+
+</div>

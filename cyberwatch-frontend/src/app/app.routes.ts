@@ -1,7 +1,4 @@
 import { Routes } from '@angular/router';
-import { Login } from './features/auth/login/login';
-import { Register } from './features/auth/register/register';
-import { Dashboard } from './features/dashboard/dashboard';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
@@ -10,14 +7,21 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full'
   },
+
   {
     path: 'login',
-    component: Login
+    loadComponent: () =>
+      import('./features/auth/login/login')
+        .then(m => m.Login)
   },
+
   {
     path: 'register',
-    component: Register
+    loadComponent: () =>
+      import('./features/auth/register/register')
+        .then(m => m.Register)
   },
+
   {
     path: 'dashboard',
     loadComponent: () =>
@@ -25,6 +29,22 @@ export const routes: Routes = [
         .then(m => m.Dashboard),
     canActivate: [authGuard]
   },
+
+  {
+    path: 'alerts',
+    loadComponent: () =>
+      import('./features/alerts/alerts')
+        .then(m => m.Alerts),
+    canActivate: [authGuard]
+  },
+  {
+  path: 'incidents',
+  loadComponent: () =>
+    import('./features/incidents/incidents')
+      .then(m => m.Incidents),
+  canActivate: [authGuard]
+},
+
   {
     path: '**',
     redirectTo: 'login'

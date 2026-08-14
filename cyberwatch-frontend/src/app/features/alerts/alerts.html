@@ -1,0 +1,171 @@
+<div class="alerts-page">
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">CYBERWATCH SOC</p>
+      <h1>Security Alerts</h1>
+      <p>Investigate and manage detected security threats.</p>
+    </div>
+
+    <button (click)="loadAlerts()">
+      Refresh
+    </button>
+  </div>
+  <div class="filters">
+
+  <button
+    [class.active]="filter === 'ALL'"
+    (click)="setFilter('ALL')"
+  >
+    All
+  </button>
+
+  <button
+    [class.active]="filter === 'NEW'"
+    (click)="setFilter('NEW')"
+  >
+    New
+  </button>
+
+  <button
+    [class.active]="filter === 'INVESTIGATING'"
+    (click)="setFilter('INVESTIGATING')"
+  >
+    Investigating
+  </button>
+
+  <button
+    [class.active]="filter === 'RESOLVED'"
+    (click)="setFilter('RESOLVED')"
+  >
+    Resolved
+  </button>
+
+  <button
+    [class.active]="filter === 'HIGH'"
+    (click)="setFilter('HIGH')"
+  >
+    High
+  </button>
+
+  <button
+    [class.active]="filter === 'CRITICAL'"
+    (click)="setFilter('CRITICAL')"
+  >
+    Critical
+  </button>
+
+</div>
+
+  @if (loading) {
+    <div class="message">
+      Loading security alerts...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (!loading && alerts.length === 0) {
+    <div class="message">
+      No security alerts detected.
+    </div>
+  }
+
+  @if (!loading && alerts.length > 0) {
+
+    <div class="alerts-list">
+
+      @for (alert of alerts; track alert.id) {
+
+        <article class="alert-card">
+
+          <div class="alert-top">
+
+            <div>
+              <h2>{{ alert.title }}</h2>
+              <p>{{ alert.description }}</p>
+            </div>
+
+            <span
+              class="severity"
+              [class.low]="alert.severity === 'LOW'"
+              [class.medium]="alert.severity === 'MEDIUM'"
+              [class.high]="alert.severity === 'HIGH'"
+              [class.critical]="alert.severity === 'CRITICAL'"
+            >
+              {{ alert.severity }}
+            </span>
+
+          </div>
+
+          <div class="network-info">
+
+            <div>
+              <span>Source IP</span>
+              <strong>{{ alert.sourceIp }}</strong>
+            </div>
+
+            <div>
+              <span>Destination IP</span>
+              <strong>{{ alert.destinationIp }}</strong>
+            </div>
+
+            <div>
+              <span>Detected</span>
+              <strong>
+                {{ alert.detectedAt | date:'medium' }}
+              </strong>
+            </div>
+
+          </div>
+
+          <div class="alert-footer">
+
+            <div>
+              Current status:
+              <strong>{{ alert.status }}</strong>
+            </div>
+
+            <div class="actions">
+
+              <button
+                class="new"
+                [disabled]="alert.status === 'NEW'"
+                (click)="changeStatus(alert, 'NEW')"
+              >
+                New
+              </button>
+
+              <button
+                class="investigate"
+                [disabled]="alert.status === 'INVESTIGATING'"
+                (click)="changeStatus(alert, 'INVESTIGATING')"
+              >
+                Investigate
+              </button>
+
+              <button
+                class="resolve"
+                [disabled]="alert.status === 'RESOLVED'"
+                (click)="changeStatus(alert, 'RESOLVED')"
+              >
+                Resolve
+              </button>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  }
+
+</div>
