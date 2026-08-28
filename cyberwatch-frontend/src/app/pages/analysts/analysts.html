@@ -1,0 +1,71 @@
+<div class="analysts-page">
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">CYBERWATCH SOC</p>
+      <h1>Analysts</h1>
+      <p>Security analysts registered in CyberWatch.</p>
+    </div>
+
+    <button (click)="loadAnalysts()">
+      Refresh
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="message">
+      Loading analysts...
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+  }
+
+  @if (!loading && analysts.length === 0) {
+    <div class="message">
+      No analysts found.
+    </div>
+  }
+
+  @if (!loading && analysts.length > 0) {
+
+    <div class="analysts-grid">
+
+      @for (analyst of analysts; track analyst.id) {
+
+        <article class="analyst-card">
+
+          <div class="avatar">
+            {{ analyst.firstName.charAt(0) }}
+          </div>
+
+          <div class="analyst-info">
+            <h2>
+              {{ analyst.firstName }}
+              {{ analyst.lastName }}
+            </h2>
+
+            <p>{{ analyst.email }}</p>
+
+            <span class="role">
+              {{ analyst.role }}
+            </span>
+
+            <div class="joined">
+              Joined:
+              {{ analyst.createdAt | date:'mediumDate' }}
+            </div>
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  }
+
+</div>
