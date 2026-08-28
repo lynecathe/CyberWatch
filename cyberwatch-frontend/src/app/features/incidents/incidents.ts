@@ -11,6 +11,11 @@ import {
   Incident
 } from '../../core/services/incident';
 
+import {
+  AnalystService,
+  Analyst
+} from '../../core/services/analyst';
+
 @Component({
   selector: 'app-incidents',
   imports: [CommonModule],
@@ -20,7 +25,11 @@ import {
 export class Incidents implements OnInit {
 
   incidents: Incident[] = [];
+
+  analysts: Analyst[] = [];
+
   loading = true;
+
   errorMessage = '';
 
   filter:
@@ -32,34 +41,72 @@ export class Incidents implements OnInit {
 
   constructor(
     private incidentService: IncidentService,
+    private analystService: AnalystService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadIncidents();
+    this.loadAnalysts();
   }
 
   loadIncidents(): void {
+
     this.loading = true;
     this.errorMessage = '';
 
     this.incidentService.getAllIncidents().subscribe({
+
       next: (incidents) => {
+
         this.incidents = incidents;
+
         this.loading = false;
 
         this.cdr.markForCheck();
+
       },
 
       error: (error) => {
+
         console.error(error);
 
         this.errorMessage = 'Unable to load incidents.';
+
         this.loading = false;
 
         this.cdr.markForCheck();
+
       }
+
     });
+
+  }
+
+  loadAnalysts(): void {
+
+    this.analystService.getAllAnalysts().subscribe({
+
+      next: (analysts) => {
+
+        this.analysts = analysts;
+
+        this.cdr.markForCheck();
+
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+        this.errorMessage = 'Unable to load analysts.';
+
+        this.cdr.markForCheck();
+
+      }
+
+    });
+
   }
 
   changeStatus(
@@ -82,17 +129,62 @@ export class Incidents implements OnInit {
           }
 
           this.cdr.markForCheck();
+
         },
 
         error: (error) => {
+
           console.error(error);
 
           this.errorMessage =
             'Unable to update incident status.';
 
           this.cdr.markForCheck();
+
         }
+
       });
+
+  }
+
+  assignAnalyst(
+    incident: Incident,
+    analystId: number
+  ): void {
+
+    this.errorMessage = '';
+
+    this.incidentService
+      .assignAnalyst(incident.id, analystId)
+      .subscribe({
+
+        next: (updatedIncident) => {
+
+          const index = this.incidents.findIndex(
+            item => item.id === updatedIncident.id
+          );
+
+          if (index !== -1) {
+            this.incidents[index] = updatedIncident;
+          }
+
+          this.cdr.markForCheck();
+
+        },
+
+        error: (error) => {
+
+          console.error(error);
+
+          this.errorMessage =
+            'Unable to assign analyst to incident.';
+
+          this.cdr.markForCheck();
+
+        }
+
+      });
+
   }
 
   get filteredIncidents(): Incident[] {
@@ -104,6 +196,7 @@ export class Incidents implements OnInit {
     return this.incidents.filter(
       incident => incident.status === this.filter
     );
+
   }
 
   setFilter(
@@ -114,6 +207,9 @@ export class Incidents implements OnInit {
       'RESOLVED' |
       'CLOSED'
   ): void {
+
     this.filter = filter;
+
   }
+
 }

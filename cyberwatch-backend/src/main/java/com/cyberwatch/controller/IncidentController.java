@@ -45,12 +45,35 @@ public class IncidentController {
                 .body(savedIncident);
     }
 
+    @PostMapping("/from-alert/{alertId}")
+    public ResponseEntity<Incident> createIncidentFromAlert(
+            @PathVariable Long alertId
+    ) {
+        Incident incident =
+                incidentService.createIncidentFromAlert(alertId);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(incident);
+    }
+
     @PatchMapping("/{id}/status")
     public Incident updateStatus(
             @PathVariable Long id,
             @RequestParam IncidentStatus status
     ) {
         return incidentService.updateStatus(id, status);
+    }
+
+    @PutMapping("/{incidentId}/assign/{analystId}")
+    public Incident assignAnalyst(
+            @PathVariable Long incidentId,
+            @PathVariable Long analystId
+    ) {
+        return incidentService.assignAnalyst(
+                incidentId,
+                analystId
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -61,15 +84,4 @@ public class IncidentController {
 
         return ResponseEntity.noContent().build();
     }
-    @PostMapping("/from-alert/{alertId}")
-public ResponseEntity<Incident> createIncidentFromAlert(
-        @PathVariable Long alertId
-) {
-    Incident incident =
-            incidentService.createIncidentFromAlert(alertId);
-
-    return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(incident);
-}
 }

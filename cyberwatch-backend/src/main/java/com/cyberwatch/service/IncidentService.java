@@ -3,10 +3,12 @@ package com.cyberwatch.service;
 import com.cyberwatch.entity.Incident;
 import com.cyberwatch.entity.IncidentSeverity;
 import com.cyberwatch.entity.IncidentStatus;
+import com.cyberwatch.entity.Role;
 import com.cyberwatch.entity.SecurityAlert;
+import com.cyberwatch.entity.User;
 import com.cyberwatch.repository.IncidentRepository;
 import com.cyberwatch.repository.SecurityAlertRepository;
-
+import com.cyberwatch.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +18,16 @@ public class IncidentService {
 
     private final IncidentRepository incidentRepository;
     private final SecurityAlertRepository securityAlertRepository;
+    private final UserRepository userRepository;
 
     public IncidentService(
             IncidentRepository incidentRepository,
-            SecurityAlertRepository securityAlertRepository
+            SecurityAlertRepository securityAlertRepository,
+            UserRepository userRepository
     ) {
         this.incidentRepository = incidentRepository;
         this.securityAlertRepository = securityAlertRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Incident> getAllIncidents() {
@@ -37,7 +42,6 @@ public class IncidentService {
     }
 
     public Incident createIncident(Incident incident) {
-
         if (incident.getStatus() == null) {
             incident.setStatus(IncidentStatus.OPEN);
         }
@@ -45,40 +49,39 @@ public class IncidentService {
         return incidentRepository.save(incident);
     }
 
-   public Incident createIncidentFromAlert(Long alertId) {
+    public Incident createIncidentFromAlert(Long alertId) {
+        if (incidentRepository.existsByAlertId(alertId)) {
+            throw new IllegalStateException(
+                    "An incident already exists for this alert"
+            );
+        }
 
-    if (incidentRepository.existsByAlertId(alertId)) {
-        throw new IllegalStateException(
-                "An incident already exists for this alert"
-        );
+        SecurityAlert alert = securityAlertRepository
+                .findById(alertId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Alert not found")
+                );
+
+        IncidentSeverity severity =
+                IncidentSeverity.valueOf(
+                        alert.getSeverity().name()
+                );
+
+        Incident incident = Incident.builder()
+                .title(alert.getTitle())
+                .description(alert.getDescription())
+                .severity(severity)
+                .status(IncidentStatus.OPEN)
+                .alert(alert)
+                .build();
+
+        return incidentRepository.save(incident);
     }
 
-    SecurityAlert alert = securityAlertRepository
-            .findById(alertId)
-            .orElseThrow(
-                    () -> new IllegalArgumentException("Alert not found")
-            );
-
-    IncidentSeverity severity =
-            IncidentSeverity.valueOf(
-                    alert.getSeverity().name()
-            );
-
-    Incident incident = Incident.builder()
-            .title(alert.getTitle())
-            .description(alert.getDescription())
-            .severity(severity)
-            .status(IncidentStatus.OPEN)
-            .alert(alert)
-            .build();
-
-    return incidentRepository.save(incident);
-}
     public Incident updateStatus(
             Long id,
             IncidentStatus status
     ) {
-
         Incident incident = getIncidentById(id);
 
         incident.setStatus(status);
@@ -86,8 +89,29 @@ public class IncidentService {
         return incidentRepository.save(incident);
     }
 
-    public void deleteIncident(Long id) {
+    public Incident assignAnalyst(
+            Long incidentId,
+            Long analystId
+    ) {
+        Incident incident = getIncidentById(incidentId);
 
+        User analyst = userRepository.findById(analystId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Analyst not found")
+                );
+
+        if (analyst.getRole() != Role.ANALYST) {
+            throw new IllegalArgumentException(
+                    "Selected user is not an analyst"
+            );
+        }
+
+        incident.setAssignedAnalyst(analyst);
+
+        return incidentRepository.save(incident);
+    }
+
+    public void deleteIncident(Long id) {
         if (!incidentRepository.existsById(id)) {
             throw new IllegalArgumentException("Incident not found");
         }

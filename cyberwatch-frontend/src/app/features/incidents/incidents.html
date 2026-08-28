@@ -113,6 +113,52 @@
               </strong>
             </div>
 
+            <div>
+              <span>Assigned Analyst</span>
+
+              @if (incident.assignedAnalyst) {
+                <strong>
+                  {{ incident.assignedAnalyst.firstName }}
+                  {{ incident.assignedAnalyst.lastName }}
+                </strong>
+              } @else {
+                <strong>Unassigned</strong>
+              }
+
+            </div>
+
+          </div>
+
+          <div class="analyst-assignment">
+
+            <span>Assign analyst</span>
+
+            <select
+              #analystSelect
+              (change)="assignAnalyst(
+                incident,
+                +analystSelect.value
+              )">
+
+              <option value="">
+                Select an analyst
+              </option>
+
+              @for (analyst of analysts; track analyst.id) {
+
+                <option
+                  [value]="analyst.id"
+                  [selected]="
+                    incident.assignedAnalyst?.id === analyst.id
+                  ">
+                  {{ analyst.firstName }}
+                  {{ analyst.lastName }}
+                </option>
+
+              }
+
+            </select>
+
           </div>
 
           <div class="actions">

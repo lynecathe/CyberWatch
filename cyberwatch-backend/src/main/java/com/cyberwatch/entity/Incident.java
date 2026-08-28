@@ -32,9 +32,13 @@ public class Incident {
     @Column(nullable = false)
     private IncidentStatus status;
 
-    @ManyToOne
-@JoinColumn(name = "alert_id")
-private SecurityAlert alert;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "alert_id")
+    private SecurityAlert alert;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "assigned_analyst_id")
+    private User assignedAnalyst;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
