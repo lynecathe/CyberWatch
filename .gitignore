@@ -1,20 +1,47 @@
-# Secrets
+# =========================
+# SECRETS / ENVIRONMENT
+# =========================
 .env
 *.env
 
-# Angular
+# =========================
+# DATABASE BACKUPS
+# =========================
+*.sql
+*.dump
+*.backup
+
+# =========================
+# ANGULAR
+# =========================
 cyberwatch-frontend/node_modules/
 cyberwatch-frontend/dist/
 cyberwatch-frontend/.angular/
+cyberwatch-frontend/.cache/
 
-# Spring Boot / Maven
+# =========================
+# SPRING BOOT / MAVEN
+# =========================
 cyberwatch-backend/target/
+*.log
 
+# =========================
 # IDE
+# =========================
 .vscode/
 .idea/
 cyberwatch-frontend/.vscode/
+cyberwatch-backend/.vscode/
 
+# =========================
 # OS
+# =========================
 .DS_Store
 Thumbs.db
+
+# =========================
+# TEMPORARY FILES
+# =========================
+*.tmp
+*.temp
+*.swp

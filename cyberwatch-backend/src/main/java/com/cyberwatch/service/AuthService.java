@@ -8,7 +8,6 @@ import com.cyberwatch.entity.Role;
 import com.cyberwatch.entity.User;
 import com.cyberwatch.repository.UserRepository;
 import com.cyberwatch.security.JwtService;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,7 @@ public class AuthService {
                 .lastName(request.lastName())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(request.role() != null ? request.role() : Role.ANALYST)
+                .role(Role.USER)
                 .build();
 
         User savedUser = userRepository.save(user);

@@ -38,8 +38,7 @@ export class Register {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
-      password: this.password,
-      role: 'ANALYST'
+      password: this.password
     }).subscribe({
 
       next: () => {
@@ -54,5 +53,7 @@ export class Register {
       }
 
     });
+
   }
+
 }

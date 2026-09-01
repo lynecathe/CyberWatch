@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export type UserRole = 'USER' | 'ANALYST' | 'ADMIN';
+
 export interface RegisterRequest {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  role: 'ADMIN' | 'ANALYST';
 }
 
 export interface UserResponse {
@@ -15,7 +16,7 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'ADMIN' | 'ANALYST';
+  role: UserRole;
   createdAt: string;
 }
 
@@ -29,7 +30,7 @@ export interface LoginResponse {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'ADMIN' | 'ANALYST';
+  role: UserRole;
   token: string;
 }
 

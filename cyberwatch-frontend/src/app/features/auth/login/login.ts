@@ -1,14 +1,26 @@
-import { Component } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router,  } from '@angular/router';
+import {
+  Router,
+  RouterLink
+} from '@angular/router';
+
 import { Auth } from '../../../core/services/auth';
 
 @Component({
   selector: 'app-login',
+
   imports: [
+    CommonModule,
     FormsModule,
-    
+    RouterLink
   ],
+
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -22,10 +34,17 @@ export class Login {
 
   constructor(
     private authService: Auth,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   login(): void {
+
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Please enter your email and password.';
+      return;
+    }
+
     this.loading = true;
     this.errorMessage = '';
 
@@ -34,29 +53,47 @@ export class Login {
       password: this.password
     }).subscribe({
 
-      next: async (user) => {
-        this.loading = false;
-
-        localStorage.setItem(
-          'cyberwatch_user',
-          JSON.stringify(user)
-        );
+      next: (response) => {
 
         localStorage.setItem(
           'cyberwatch_token',
-          user.token
+          response.token
         );
 
-        const navigated = await this.router.navigate(['/dashboard']);
+        localStorage.setItem(
+          'cyberwatch_role',
+          response.role
+        );
 
-        console.log('NAVIGATION RESULT', navigated);
+        localStorage.setItem(
+          'cyberwatch_user',
+          JSON.stringify({
+            id: response.id,
+            firstName: response.firstName,
+            lastName: response.lastName,
+            email: response.email,
+            role: response.role
+          })
+        );
+
+        this.loading = false;
+
+        this.router.navigate(['/dashboard']);
       },
 
       error: (error) => {
+
         console.error(error);
 
         this.loading = false;
-        this.errorMessage = 'Invalid email or password.';
+
+        if (error.status === 401) {
+          this.errorMessage = 'Invalid email or password.';
+        } else {
+          this.errorMessage = 'Unable to sign in. Please try again.';
+        }
+
+        this.cdr.markForCheck();
       }
 
     });

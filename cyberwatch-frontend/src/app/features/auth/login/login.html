@@ -1,47 +1,81 @@
-<form (ngSubmit)="login()">
+<div class="login-page">
 
-  <div class="form-group">
-    <label for="email">Email address</label>
+  <div class="login-card">
 
-    <input
-      id="email"
-      type="email"
-      name="email"
-      [(ngModel)]="email"
-      autocomplete="email"
-      placeholder="analyst@cyberwatch.local"
-      required
-    >
-  </div>
-
-  <div class="form-group">
-    <div class="password-label">
-      <label for="password">Password</label>
-      <a href="#">Forgot password?</a>
+    <div class="logo">
+      <div class="logo-icon">C</div>
+      <span>CyberWatch</span>
     </div>
 
-    <input
-      id="password"
-      type="password"
-      name="password"
-      [(ngModel)]="password"
-      autocomplete="current-password"
-      placeholder="Enter your password"
-      required
-    >
+    <p class="eyebrow">
+      SECURITY OPERATIONS CENTER
+    </p>
+
+    <h1>Welcome back</h1>
+
+    <p class="subtitle">
+      Sign in to access your CyberWatch account.
+    </p>
+
+    <form (ngSubmit)="login()">
+
+      <div class="form-group">
+        <label for="email">Email address</label>
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+
+        <div class="password-label">
+          <label for="password">Password</label>
+
+          <a href="#">
+            Forgot password?
+          </a>
+        </div>
+
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          required
+        >
+      </div>
+
+      @if (errorMessage) {
+        <p class="error-message">
+          {{ errorMessage }}
+        </p>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading"
+      >
+        {{ loading ? 'Signing in...' : 'Sign in →' }}
+      </button>
+
+    </form>
+
+    <p class="register-link">
+      Don't have an account?
+      <a routerLink="/register">
+        Create account
+      </a>
+    </p>
+
   </div>
 
-  @if (errorMessage) {
-    <p class="error-message">
-      {{ errorMessage }}
-    </p>
-  }
-
-  <button
-    type="submit"
-    [disabled]="loading"
-  >
-    {{ loading ? 'Signing in...' : 'Sign in →' }}
-  </button>
-
-</form>
+</div>

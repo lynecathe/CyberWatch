@@ -1,65 +1,65 @@
-<div class="dashboard-layout">
+<main class="main-content">
 
-  <aside class="sidebar">
+  <!-- HEADER -->
+  <header class="topbar">
 
-    <div class="brand">
-      <div class="logo-icon">C</div>
-      <span>CyberWatch</span>
+    <div>
+      <p class="eyebrow">
+        SECURITY OPERATIONS CENTER
+      </p>
+
+      <h1>
+        Security Dashboard
+      </h1>
+
+      @if (currentUser) {
+        <p class="welcome-text">
+          Welcome back,
+          {{ currentUser.firstName }}.
+          You are connected as
+          <strong>{{ currentUser.role }}</strong>.
+        </p>
+      }
     </div>
 
-    <nav>
-      <a routerLink="/dashboard" class="active">
-        Dashboard
-      </a>
-
-      <a routerLink="/alerts">
-        Alerts
-      </a>
-
-      <a routerLink="/incidents">
-        Incidents
-      </a>
-
-      <a routerLink="/machines">
-        Machines
-      </a>
-
-      <a>
-        Analysts
-      </a>
-    </nav>
-
-    <div class="sidebar-footer">
-      <span class="status-dot"></span>
-      System operational
-    </div>
-
-  </aside>
-
-  <main class="main-content">
-
-    <!-- HEADER -->
-    <header class="topbar">
-
-      <div>
-        <p class="eyebrow">SECURITY OPERATIONS CENTER</p>
-        <h1>Security Dashboard</h1>
-      </div>
+    @if (currentUser) {
 
       <div class="user-box">
-        <div class="avatar">A</div>
+
+        <div class="avatar">
+          {{ currentUser.firstName.charAt(0) }}
+        </div>
 
         <div>
-          <strong>Analyst</strong>
-          <span>CyberWatch SOC</span>
+          <strong>
+            {{ currentUser.firstName }}
+            {{ currentUser.lastName }}
+          </strong>
+
+          <span>
+            {{ currentUser.role }}
+          </span>
         </div>
+
       </div>
 
-    </header>
+    }
+
+  </header>
 
 
-    <!-- ALERT STATISTICS -->
-    <section class="stats-grid">
+  <!-- ALERT STATISTICS -->
+  <section class="dashboard-section">
+
+    <div class="section-title">
+      <h2>Security Alerts</h2>
+
+      <p>
+        Current threat detection activity.
+      </p>
+    </div>
+
+    <div class="stats-grid">
 
       <div class="stat-card">
         <span>Total Alerts</span>
@@ -71,28 +71,82 @@
         <strong>{{ openAlerts }}</strong>
       </div>
 
-      <div class="stat-card">
+      <div class="stat-card warning">
         <span>High Severity</span>
         <strong>{{ highAlerts }}</strong>
       </div>
 
       <div class="stat-card danger">
-        <span>Critical</span>
+        <span>Critical Alerts</span>
         <strong>{{ criticalAlerts }}</strong>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- INCIDENT STATISTICS -->
+  @if (canAccessIncidents) {
+
+    <section class="dashboard-section">
+
+      <div class="section-title">
+        <h2>Security Incidents</h2>
+
+        <p>
+          Confirmed threats currently handled by the SOC.
+        </p>
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span>Total Incidents</span>
+          <strong>{{ totalIncidents }}</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Open Incidents</span>
+          <strong>{{ openIncidents }}</strong>
+        </div>
+
+        <div class="stat-card warning">
+          <span>Investigating</span>
+          <strong>{{ investigatingIncidents }}</strong>
+        </div>
+
+        <div class="stat-card success">
+          <span>Resolved</span>
+          <strong>{{ resolvedIncidents }}</strong>
+        </div>
+
       </div>
 
     </section>
 
+  }
 
-    <!-- MACHINE STATISTICS -->
-    <section class="stats-grid machine-stats">
+
+  <!-- MACHINE STATISTICS -->
+  <section class="dashboard-section">
+
+    <div class="section-title">
+      <h2>Infrastructure</h2>
+
+      <p>
+        Current status of monitored machines.
+      </p>
+    </div>
+
+    <div class="stats-grid machine-stats">
 
       <div class="stat-card">
         <span>Total Machines</span>
         <strong>{{ totalMachines }}</strong>
       </div>
 
-      <div class="stat-card">
+      <div class="stat-card success">
         <span>Online</span>
         <strong>{{ onlineMachines }}</strong>
       </div>
@@ -107,144 +161,426 @@
         <strong>{{ compromisedMachines }}</strong>
       </div>
 
-    </section>
+    </div>
+
+  </section>
 
 
-    <!-- RECENT ALERTS -->
-    <section class="alerts-section">
+  <!-- CHARTS -->
+  <section class="charts-section">
 
-      <div class="section-header">
+    <!-- ALERT SEVERITY -->
+    <div class="chart-card">
 
-        <div>
-          <h2>Recent Security Alerts</h2>
-          <p>
-            Monitor detected threats and suspicious activity.
-          </p>
+      <div class="chart-header">
+        <h2>Alerts by Severity</h2>
+
+        <p>
+          Distribution of detected security alerts.
+        </p>
+      </div>
+
+      <div class="chart-list">
+
+        <div class="chart-row">
+
+          <div class="chart-label">
+            <span>Low</span>
+            <strong>{{ lowAlerts }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar low-bar"
+              [style.width.%]="
+                lowAlerts / alertSeverityTotal * 100
+              ">
+            </div>
+          </div>
+
         </div>
 
-        <button (click)="loadAlerts()">
-          Refresh
-        </button>
+        <div class="chart-row">
+
+          <div class="chart-label">
+            <span>Medium</span>
+            <strong>{{ mediumAlerts }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar medium-bar"
+              [style.width.%]="
+                mediumAlerts / alertSeverityTotal * 100
+              ">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="chart-row">
+
+          <div class="chart-label">
+            <span>High</span>
+            <strong>{{ highAlerts }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar high-bar"
+              [style.width.%]="
+                highAlerts / alertSeverityTotal * 100
+              ">
+            </div>
+          </div>
+
+        </div>
+
+        <div class="chart-row">
+
+          <div class="chart-label">
+            <span>Critical</span>
+            <strong>{{ criticalAlerts }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar critical-bar"
+              [style.width.%]="
+                criticalAlerts / alertSeverityTotal * 100
+              ">
+            </div>
+          </div>
+
+        </div>
 
       </div>
 
+    </div>
 
-      @if (loading) {
 
-        <div class="state-message">
-          Loading security alerts...
+    <!-- MACHINE STATUS -->
+    <div class="chart-card">
+
+      <div class="chart-header">
+        <h2>Machine Status</h2>
+
+        <p>
+          Current health of monitored endpoints.
+        </p>
+      </div>
+
+      <div class="chart-list">
+
+        <div class="chart-row">
+
+          <div class="chart-label">
+            <span>Online</span>
+            <strong>{{ onlineMachines }}</strong>
+          </div>
+
+          <div class="bar-track">
+            <div
+              class="bar online-bar"
+              [style.width.%]="
+                onlineMachines / machineTotalForChart * 100
+              ">
+            </div>
+          </div>
+
         </div>
 
-      }
+        <div class="chart-row">
 
+          <div class="chart-label">
+            <span>Offline</span>
+            <strong>{{ offlineMachines }}</strong>
+          </div>
 
-      @if (errorMessage) {
+          <div class="bar-track">
+            <div
+              class="bar offline-bar"
+              [style.width.%]="
+                offlineMachines / machineTotalForChart * 100
+              ">
+            </div>
+          </div>
 
-        <div class="state-message error">
-          {{ errorMessage }}
         </div>
 
-      }
+        <div class="chart-row">
 
+          <div class="chart-label">
+            <span>Compromised</span>
+            <strong>{{ compromisedMachines }}</strong>
+          </div>
 
-      @if (!loading && alerts.length === 0) {
+          <div class="bar-track">
+            <div
+              class="bar compromised-bar"
+              [style.width.%]="
+                compromisedMachines / machineTotalForChart * 100
+              ">
+            </div>
+          </div>
 
-        <div class="state-message">
-          No security alerts detected.
         </div>
 
-      }
+      </div>
+
+    </div>
 
 
-      @if (!loading && alerts.length > 0) {
+    <!-- INCIDENT STATUS -->
+    @if (canAccessIncidents) {
 
-        <div class="table-wrapper">
+      <div class="chart-card full-width">
 
-          <table>
+        <div class="chart-header">
+          <h2>Incident Status</h2>
 
-            <thead>
+          <p>
+            Current SOC incident workflow.
+          </p>
+        </div>
+
+        <div class="chart-list incident-chart">
+
+          <div class="chart-row">
+
+            <div class="chart-label">
+              <span>Open</span>
+              <strong>{{ openIncidents }}</strong>
+            </div>
+
+            <div class="bar-track">
+              <div
+                class="bar open-bar"
+                [style.width.%]="
+                  openIncidents / incidentTotalForChart * 100
+                ">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="chart-row">
+
+            <div class="chart-label">
+              <span>Investigating</span>
+              <strong>{{ investigatingIncidents }}</strong>
+            </div>
+
+            <div class="bar-track">
+              <div
+                class="bar investigating-bar"
+                [style.width.%]="
+                  investigatingIncidents / incidentTotalForChart * 100
+                ">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="chart-row">
+
+            <div class="chart-label">
+              <span>Resolved</span>
+              <strong>{{ resolvedIncidents }}</strong>
+            </div>
+
+            <div class="bar-track">
+              <div
+                class="bar resolved-bar"
+                [style.width.%]="
+                  resolvedIncidents / incidentTotalForChart * 100
+                ">
+              </div>
+            </div>
+
+          </div>
+
+          <div class="chart-row">
+
+            <div class="chart-label">
+              <span>Closed</span>
+              <strong>{{ closedIncidents }}</strong>
+            </div>
+
+            <div class="bar-track">
+              <div
+                class="bar closed-bar"
+                [style.width.%]="
+                  closedIncidents / incidentTotalForChart * 100
+                ">
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+
+  </section>
+
+
+  <!-- RECENT ALERTS -->
+  <section class="alerts-section">
+
+    <div class="section-header">
+
+      <div>
+        <h2>
+          Recent Security Alerts
+        </h2>
+
+        <p>
+          Latest threats detected by the CyberWatch
+          detection engine.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        (click)="loadAlerts()">
+        Refresh
+      </button>
+
+    </div>
+
+
+    @if (loading) {
+
+      <div class="state-message">
+        Loading security alerts...
+      </div>
+
+    }
+
+
+    @if (errorMessage) {
+
+      <div class="state-message error">
+        {{ errorMessage }}
+      </div>
+
+    }
+
+
+    @if (!loading && recentAlerts.length === 0) {
+
+      <div class="state-message">
+        No security alerts detected.
+      </div>
+
+    }
+
+
+    @if (!loading && recentAlerts.length > 0) {
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Alert</th>
+              <th>Source IP</th>
+              <th>Destination</th>
+              <th>Severity</th>
+              <th>Status</th>
+              <th>Detected</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            @for (
+              alert of recentAlerts;
+              track alert.id
+            ) {
 
               <tr>
-                <th>Alert</th>
-                <th>Source IP</th>
-                <th>Destination</th>
-                <th>Severity</th>
-                <th>Status</th>
-                <th>Detected</th>
+
+                <td>
+
+                  <div class="alert-title">
+
+                    <strong>
+                      {{ alert.title }}
+                    </strong>
+
+                    <span>
+                      {{ alert.description }}
+                    </span>
+
+                  </div>
+
+                </td>
+
+                <td>
+                  {{ alert.sourceIp }}
+                </td>
+
+                <td>
+                  {{ alert.destinationIp }}
+                </td>
+
+                <td>
+
+                  <span
+                    class="badge"
+                    [class.low]="
+                      alert.severity === 'LOW'
+                    "
+                    [class.medium]="
+                      alert.severity === 'MEDIUM'
+                    "
+                    [class.high]="
+                      alert.severity === 'HIGH'
+                    "
+                    [class.critical]="
+                      alert.severity === 'CRITICAL'
+                    ">
+
+                    {{ alert.severity }}
+
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <span class="status-badge">
+                    {{ alert.status }}
+                  </span>
+
+                </td>
+
+                <td>
+                  {{
+                    alert.detectedAt
+                      | date:'short'
+                  }}
+                </td>
+
               </tr>
 
-            </thead>
+            }
 
-            <tbody>
+          </tbody>
 
-              @for (alert of alerts; track alert.id) {
+        </table>
 
-                <tr>
+      </div>
 
-                  <td>
+    }
 
-                    <div class="alert-title">
+  </section>
 
-                      <strong>
-                        {{ alert.title }}
-                      </strong>
-
-                      <span>
-                        {{ alert.description }}
-                      </span>
-
-                    </div>
-
-                  </td>
-
-                  <td>
-                    {{ alert.sourceIp }}
-                  </td>
-
-                  <td>
-                    {{ alert.destinationIp }}
-                  </td>
-
-                  <td>
-
-                    <span
-                      class="badge"
-                      [class.low]="alert.severity === 'LOW'"
-                      [class.medium]="alert.severity === 'MEDIUM'"
-                      [class.high]="alert.severity === 'HIGH'"
-                      [class.critical]="alert.severity === 'CRITICAL'"
-                    >
-                      {{ alert.severity }}
-                    </span>
-
-                  </td>
-
-                  <td>
-
-                    <span class="status-badge">
-                      {{ alert.status }}
-                    </span>
-
-                  </td>
-
-                  <td>
-                    {{ alert.detectedAt | date:'short' }}
-                  </td>
-
-                </tr>
-
-              }
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      }
-
-    </section>
-
-  </main>
-
-</div>
+</main>

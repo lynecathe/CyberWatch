@@ -1,6 +1,7 @@
 package com.cyberwatch.entity;
 
 public enum Role {
-    ADMIN,
-    ANALYST
+    USER,
+    ANALYST,
+    ADMIN
 }

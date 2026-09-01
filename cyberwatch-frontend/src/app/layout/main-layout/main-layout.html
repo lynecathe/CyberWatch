@@ -1,0 +1,110 @@
+<div class="app-layout">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="logo-icon">C</div>
+      <span>CyberWatch</span>
+    </div>
+
+    @if (currentUser) {
+
+      <div class="current-user">
+
+        <div class="user-avatar">
+          {{ initials }}
+        </div>
+
+        <div class="user-details">
+
+          <strong>
+            {{ currentUser.firstName }}
+            {{ currentUser.lastName }}
+          </strong>
+
+          <span class="user-role">
+            {{ currentUser.role }}
+          </span>
+
+        </div>
+
+      </div>
+
+    }
+
+    <nav>
+
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">
+        Dashboard
+      </a>
+
+      <a
+        routerLink="/alerts"
+        routerLinkActive="active">
+        Alerts
+      </a>
+
+      @if (canAccessSocFeatures) {
+
+        <a
+          routerLink="/incidents"
+          routerLinkActive="active">
+          Incidents
+        </a>
+
+      }
+
+      <a
+        routerLink="/machines"
+        routerLinkActive="active">
+        Machines
+      </a>
+
+      @if (canAccessSocFeatures) {
+
+        <a
+          routerLink="/analysts"
+          routerLinkActive="active">
+          Analysts
+        </a>
+
+      }
+
+      @if (isAdmin) {
+
+        <a
+          routerLink="/users"
+          routerLinkActive="active">
+          Users
+        </a>
+
+      }
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <div class="system-status">
+        <span class="status-dot"></span>
+        System operational
+      </div>
+
+      <button
+        class="logout-button"
+        type="button"
+        (click)="logout()">
+        Logout
+      </button>
+
+    </div>
+
+  </aside>
+
+  <main class="page-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

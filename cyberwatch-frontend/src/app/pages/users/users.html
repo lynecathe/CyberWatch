@@ -1,0 +1,201 @@
+<div class="users-page">
+
+  <div class="page-header">
+
+    <div>
+      <p class="eyebrow">
+        CYBERWATCH ADMINISTRATION
+      </p>
+
+      <h1>User Management</h1>
+
+      <p class="description">
+        Manage CyberWatch users and assign
+        security roles.
+      </p>
+    </div>
+
+    <button
+      class="refresh-button"
+      type="button"
+      (click)="loadUsers()"
+      [disabled]="loading">
+      {{ loading ? 'Loading...' : 'Refresh' }}
+    </button>
+
+  </div>
+
+
+  @if (successMessage) {
+    <div class="message success">
+      {{ successMessage }}
+    </div>
+  }
+
+
+  @if (errorMessage) {
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+  }
+
+
+  @if (loading && users.length === 0) {
+    <div class="message">
+      Loading users...
+    </div>
+  }
+
+
+  @if (!loading && users.length === 0 && !errorMessage) {
+    <div class="message">
+      No users found.
+    </div>
+  }
+
+
+  @if (users.length > 0) {
+
+    <div class="users-card">
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Current role</th>
+              <th>Joined</th>
+              <th>Change role</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (user of users; track user.id) {
+
+              <tr>
+
+                <!-- USER -->
+                <td>
+
+                  <div class="user-cell">
+
+                    <div class="avatar">
+                      {{ getInitials(user) }}
+                    </div>
+
+                    <div class="user-name">
+
+                      <strong>
+                        {{ user.firstName }}
+                        {{ user.lastName }}
+                      </strong>
+
+                      <span>
+                        ID #{{ user.id }}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+
+                <!-- EMAIL -->
+                <td class="email">
+                  {{ user.email }}
+                </td>
+
+
+                <!-- CURRENT ROLE -->
+                <td>
+
+                  <span
+                    class="role-badge"
+                    [class.role-user]="user.role === 'USER'"
+                    [class.role-analyst]="user.role === 'ANALYST'"
+                    [class.role-admin]="user.role === 'ADMIN'">
+
+                    {{ user.role }}
+
+                  </span>
+
+                </td>
+
+
+                <!-- JOIN DATE -->
+                <td class="joined">
+                  {{ user.createdAt | date:'mediumDate' }}
+                </td>
+
+
+                <!-- ROLE MANAGEMENT -->
+                <td>
+
+                  @if (isCurrentAdmin(user)) {
+
+                    <div class="locked-role">
+                      ADMIN
+                      <span class="lock-icon">
+                        🔒
+                      </span>
+                    </div>
+
+                    <span class="protected-account">
+                      Your account
+                    </span>
+
+                  } @else {
+
+                    <select
+                      class="role-select"
+                      [ngModel]="user.role"
+                      (ngModelChange)="changeRole(user, $event)"
+                      [disabled]="updatingUserId === user.id">
+
+                      <option value="USER">
+                        USER
+                      </option>
+
+                      <option value="ANALYST">
+                        ANALYST
+                      </option>
+
+                      <option value="ADMIN">
+                        ADMIN
+                      </option>
+
+                    </select>
+
+
+                    @if (updatingUserId === user.id) {
+
+                      <span class="updating">
+                        Updating...
+                      </span>
+
+                    }
+
+                  }
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>
